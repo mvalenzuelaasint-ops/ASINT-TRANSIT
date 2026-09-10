@@ -5,30 +5,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ----- PRIMARIO: AZUL MARINO (color predominante) ----- //
-        'primary': '#1A3A6B',
+        // ----- PRIMARIO: PÚRPURA NABLA/ASINT (color de marca, tono oscurecido para contraste con blanco) ----- //
+        'primary': '#6452A2',
 
-        'primary-dim': '#142E58',
-        'primary-fixed': '#2C4E84',
-        'primary-fixed-dim': '#1A3A6B',
+        'primary-dim': '#4B3D79',
+        'primary-fixed': '#AAA0CC',
+        'primary-fixed-dim': '#6452A2',
         'on-primary': '#FFFFFF',
-        'on-primary-fixed': '#FFFFFF',
-        'on-primary-fixed-variant': '#D0DAEA',
-        'on-primary-container': '#1A3A6B',
-        'primary-container': '#D0DAEA',
-        'inverse-primary': '#7B9BC9',
+        'on-primary-fixed': '#241C40',
+        'on-primary-fixed-variant': '#4A3D73',
+        'on-primary-container': '#453874',
+        'primary-container': '#F0EEF6',
+        'inverse-primary': '#C9C2DE',
 
-        // ----- SECUNDARIO: AZUL MEDIO ----- //
-        'secondary': '#2C4E84',
+        // ----- SECUNDARIO: GRAFITO (del isotipo NABLA) ----- //
+        'secondary': '#3A3748',
 
-        'secondary-dim': '#1F3D6B',
-        'secondary-fixed': '#E5ECF5',
-        'secondary-fixed-dim': '#B8C8DC',
+        'secondary-dim': '#232130',
+        'secondary-fixed': '#ECEBF0',
+        'secondary-fixed-dim': '#B7B3C4',
         'on-secondary': '#FFFFFF',
-        'on-secondary-fixed': '#1A3A6B',
-        'on-secondary-fixed-variant': '#2C4E84',
-        'on-secondary-container': '#1A3A6B',
-        'secondary-container': '#E5ECF5',
+        'on-secondary-fixed': '#3A3748',
+        'on-secondary-fixed-variant': '#6E6A80',
+        'on-secondary-container': '#3A3748',
+        'secondary-container': '#ECEBF0',
 
         // ----- TERCIARIO: ADVERTENCIA Y ALERTAS ----- //
         'tertiary': '#D99300',
@@ -42,31 +42,31 @@ export default {
         'tertiary-container': '#FFEAAA',
         'on-tertiary-container': '#2B1F00',
 
-        // ----- SUPERFICIES: Blanco y grises claros ----- //
-        'background': '#F5F7FA',
+        // ----- SUPERFICIES: Blanco predominante ----- //
+        'background': '#FAF9FD',
         'surface': '#FFFFFF',
 
-        'surface-dim': '#E8EDF3',
+        'surface-dim': '#EFEAFB',
         'surface-bright': '#FFFFFF',
-        'surface-tint': '#1A3A6B',
-        'surface-variant': '#E5ECF5',
+        'surface-tint': '#6452A2',
+        'surface-variant': '#ECEBF0',
         'surface-container-lowest': '#FFFFFF',
-        'surface-container-low': '#F5F7FA',
-        'surface-container': '#EEF2F8',
-        'surface-container-high': '#E5ECF5',
-        'surface-container-highest': '#D8E2EE',
+        'surface-container-low': '#FAF9FD',
+        'surface-container': '#F4F1FA',
+        'surface-container-high': '#ECE6F7',
+        'surface-container-highest': '#DED4F2',
 
         // ----- TEXTOS ----- //
-        'on-surface': '#0F1F3D',
-        'on-background': '#0F1F3D',
+        'on-surface': '#12121A',
+        'on-background': '#12121A',
 
-        'on-surface-variant': '#4A5E80',
-        'inverse-surface': '#0F1F3D',
-        'inverse-on-surface': '#F5F7FA',
+        'on-surface-variant': '#6E6A80',
+        'inverse-surface': '#12121A',
+        'inverse-on-surface': '#FAF9FD',
 
         //----- CONTORNOS -----//
-        'outline': '#4A5E80',
-        'outline-variant': '#1A3A6B',
+        'outline': '#6E6A80',
+        'outline-variant': '#6452A2',
 
         // ----- ERRORES ----- //
         'error': '#C8102E',

@@ -15,8 +15,8 @@ body {
 
 body {
   margin: 0;
-  background: #F5F7FA;
-  color: #0F1F3D;
+  background: #FAF9FD;
+  color: #12121A;
   font-family: 'DM Sans', sans-serif;
 }
 
@@ -112,13 +112,13 @@ textarea {
 .mat-mdc-form-field.mat-mdc-form-field-type-mat-select,
 .mat-mdc-form-field.mat-mdc-form-field-type-mat-input {
   --mdc-filled-text-field-container-color: #FFFFFF;
-  --mdc-filled-text-field-focus-active-indicator-color: #1A3A6B;
-  --mdc-filled-text-field-hover-active-indicator-color: #7B8DA8;
-  --mdc-filled-text-field-label-text-color: #4A5E80;
-  --mdc-filled-text-field-input-text-color: #0F1F3D;
-  --mat-select-enabled-trigger-text-color: #0F1F3D;
-  --mat-select-focused-arrow-color: #1A3A6B;
-  --mat-select-enabled-arrow-color: #4A5E80;
+  --mdc-filled-text-field-focus-active-indicator-color: #6452A2;
+  --mdc-filled-text-field-hover-active-indicator-color: #A79BC7;
+  --mdc-filled-text-field-label-text-color: #6E6A80;
+  --mdc-filled-text-field-input-text-color: #12121A;
+  --mat-select-enabled-trigger-text-color: #12121A;
+  --mat-select-focused-arrow-color: #6452A2;
+  --mat-select-enabled-arrow-color: #6E6A80;
 }
 
 .mat-mdc-select-panel {
@@ -126,24 +126,24 @@ textarea {
 }
 
 .mat-mdc-option {
-  color: #0F1F3D !important;
+  color: #12121A !important;
 }
 
 .mat-mdc-option:hover,
 .mat-mdc-option.mdc-list-item--selected {
-  background: #E5ECF5 !important;
+  background: #ECE6F7 !important;
 }
 
 .mat-mdc-checkbox {
   --mdc-checkbox-selected-checkmark-color: #ffffff;
-  --mdc-checkbox-selected-focus-icon-color: #1A3A6B;
-  --mdc-checkbox-selected-hover-icon-color: #1A3A6B;
-  --mdc-checkbox-selected-icon-color: #1A3A6B;
-  --mdc-checkbox-selected-pressed-icon-color: #142E58;
-  --mdc-checkbox-unselected-focus-icon-color: #4A5E80;
-  --mdc-checkbox-unselected-hover-icon-color: #4A5E80;
-  --mdc-checkbox-unselected-icon-color: #7B8DA8;
-  --mdc-form-field-label-text-color: #0F1F3D;
+  --mdc-checkbox-selected-focus-icon-color: #6452A2;
+  --mdc-checkbox-selected-hover-icon-color: #6452A2;
+  --mdc-checkbox-selected-icon-color: #6452A2;
+  --mdc-checkbox-selected-pressed-icon-color: #4B3D79;
+  --mdc-checkbox-unselected-focus-icon-color: #6E6A80;
+  --mdc-checkbox-unselected-hover-icon-color: #6E6A80;
+  --mdc-checkbox-unselected-icon-color: #A79BC7;
+  --mdc-form-field-label-text-color: #12121A;
 }
 
 .mat-mdc-form-field-subscript-wrapper {
@@ -153,7 +153,7 @@ textarea {
 /* Scrollbar fino para el sidebar (Firefox + WebKit). */
 .sidebar-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(26, 58, 107, 0.35) transparent;
+  scrollbar-color: rgba(100, 82, 162, 0.35) transparent;
 }
 .sidebar-scroll::-webkit-scrollbar {
   width: 6px;
@@ -162,47 +162,47 @@ textarea {
   background: transparent;
 }
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(26, 58, 107, 0.35);
+  background-color: rgba(100, 82, 162, 0.35);
   border-radius: 3px;
 }
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(26, 58, 107, 0.55);
+  background-color: rgba(100, 82, 162, 0.55);
 }
 
 .fleet-map,
 .leaflet-container {
-  background: #E8EDF3;
-  color: #0F1F3D;
+  background: #EFEAFB;
+  color: #12121A;
   font-family: 'Inter', sans-serif;
 }
 
 .fleet-map .leaflet-control-zoom,
 .fleet-map .leaflet-control-attribution {
-  border: 1px solid rgba(123, 141, 168, 0.4);
+  border: 1px solid rgba(167, 155, 199, 0.4);
   border-radius: 8px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.92);
-  color: #4A5E80;
+  color: #6E6A80;
   backdrop-filter: blur(12px);
 }
 
 .fleet-map .leaflet-control-zoom a {
-  border-color: rgba(123, 141, 168, 0.4);
+  border-color: rgba(167, 155, 199, 0.4);
   background: rgba(255, 255, 255, 0.92);
-  color: #0F1F3D;
+  color: #12121A;
 }
 
 .fleet-map .leaflet-control-zoom a:hover {
-  background: #E5ECF5;
-  color: #1A3A6B;
+  background: #ECE6F7;
+  color: #6452A2;
 }
 
 .fleet-map .leaflet-popup-content-wrapper,
 .fleet-map .leaflet-popup-tip {
-  border: 1px solid rgba(123, 141, 168, 0.4);
+  border: 1px solid rgba(167, 155, 199, 0.4);
   background: #FFFFFF;
-  color: #0F1F3D;
-  box-shadow: 0 18px 44px rgba(15, 31, 61, 0.15);
+  color: #12121A;
+  box-shadow: 0 18px 44px rgba(18, 18, 26, 0.15);
 }
 
 .fleet-map .leaflet-popup-content {
@@ -227,7 +227,7 @@ textarea {
   border-radius: 999px;
   color: #ffffff;
   cursor: pointer;
-  filter: drop-shadow(0 4px 12px rgba(15, 31, 61, 0.35));
+  filter: drop-shadow(0 4px 12px rgba(18, 18, 26, 0.35));
   transform: rotate(var(--heading));
   transition:
     transform 160ms ease,
@@ -235,7 +235,7 @@ textarea {
 }
 
 .fleet-marker:hover {
-  box-shadow: 0 0 0 5px rgba(26, 58, 107, 0.2);
+  box-shadow: 0 0 0 5px rgba(100, 82, 162, 0.2);
   transform: rotate(var(--heading)) scale(1.08);
 }
 
@@ -245,7 +245,7 @@ textarea {
 }
 
 .fleet-marker--on-time {
-  background: #1A3A6B;
+  background: #6452A2;
 }
 
 .fleet-marker--delayed {
@@ -254,5 +254,5 @@ textarea {
 }
 
 .fleet-marker--charging {
-  background: #2C4E84;
+  background: #3A3748;
 }

@@ -85,7 +85,7 @@ const LIVE_VEHICLES: readonly LiveVehicle[] = [
 const TRAFFIC_CORRIDORS: readonly { coordinates: L.LatLngExpression[]; color: string; weight: number }[] = [
   { coordinates: [[-33.4372, -70.6506], [-33.4569, -70.6483], [-33.489, -70.6358]], color: '#c8102e', weight: 5 },
   { coordinates: [[-33.4277, -70.6125], [-33.4372, -70.6506], [-33.4694, -70.7072]], color: '#f5a800', weight: 4 },
-  { coordinates: [[-33.4694, -70.7072], [-33.4569, -70.6483], [-33.4277, -70.6125]], color: '#1a3a6b', weight: 4 },
+  { coordinates: [[-33.4694, -70.7072], [-33.4569, -70.6483], [-33.4277, -70.6125]], color: '#6452a2', weight: 4 },
 ];
 
 const THERMAL_ZONES: readonly { center: L.LatLngExpression; radius: number; color: string; label: string }[] = [

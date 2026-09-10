@@ -43,8 +43,8 @@ interface RunResponse {
         <p class="font-label text-[10px] font-bold uppercase tracking-widest text-primary">Ejecución operacional</p>
         <h1 class="mt-1 font-headline text-2xl font-bold uppercase tracking-tight text-on-surface md:text-3xl">Tasas de ocupación</h1>
         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">
-          Carga el archivo de contadores de pasajeros para calcular tasas de ocupación promedio por servicio, tipo de día y período.
-          Se generarán reportes Excel agrupados por línea de transporte.
+          Cargue el archivo de contadores de pasajeros y calcularemos las tasas de ocupación promedio por servicio, tipo de día y período.
+          Al finalizar, obtendrá reportes Excel agrupados por línea de transporte.
         </p>
       </header>
 

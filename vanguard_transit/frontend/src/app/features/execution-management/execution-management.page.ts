@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
         <p class="font-label text-[10px] font-bold uppercase tracking-widest text-primary">Ejecución operacional</p>
         <h1 class="mt-1 font-headline text-2xl font-bold uppercase tracking-tight text-on-surface md:text-3xl">Gestión</h1>
         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">
-          Comunicación operacional con conductores a través de WhatsApp. Usa el comando <code class="rounded bg-surface-container px-1.5 py-0.5 text-[11px] text-primary">!puntualidad</code> para activar el chatbot.
+          Comunicación operacional con conductores a través de WhatsApp. Use el comando <code class="rounded bg-surface-container px-1.5 py-0.5 text-[11px] text-primary">!puntualidad</code> para activar el chatbot.
         </p>
       </header>
 
@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
           <div class="min-w-0 flex-1">
             <h2 class="section-title">Integración WhatsApp</h2>
             <p class="mt-2 text-sm leading-relaxed text-on-surface-variant">
-              Abre WhatsApp Web y envía el comando <strong>!puntualidad</strong> al chatbot para consultar indicadores operacionales.
+              Abra WhatsApp Web y envíe el comando <strong>!puntualidad</strong> al chatbot para consultar los indicadores operacionales.
             </p>
             <div class="mt-4">
               <a

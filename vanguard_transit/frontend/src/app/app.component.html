@@ -5,12 +5,24 @@
         <span class="material-symbols-outlined text-xl">menu</span>
       </button>
 
-      <a routerLink="/planning/optimization" class="flex min-w-0 items-center gap-2">
-        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
-          <span class="material-symbols-outlined text-lg">directions_bus</span>
-        </span>
-        <span class="truncate font-headline text-lg font-bold uppercase tracking-tight text-on-surface">
-          ASINT <span class="text-primary">Transit</span>
+      <a routerLink="/planning/optimization" class="flex min-w-0 items-center gap-2.5">
+        <svg class="h-8 w-8 shrink-0" viewBox="0 0 100 100" aria-hidden="true">
+          <g stroke-linecap="round" fill="none">
+            <path d="M24 30 H76" stroke="#3A3748" stroke-width="7" opacity="0.5"></path>
+            <path d="M24 30 L50 78" stroke="#3A3748" stroke-width="7" opacity="0.5"></path>
+            <path d="M76 30 L50 78" stroke="#6452A2" stroke-width="7"></path>
+            <circle cx="24" cy="30" r="10" fill="#FFFFFF" stroke="#3A3748" stroke-width="7"></circle>
+            <circle cx="76" cy="30" r="10" fill="#FFFFFF" stroke="#6452A2" stroke-width="7"></circle>
+            <circle cx="50" cy="78" r="10" fill="#6452A2" stroke="none"></circle>
+          </g>
+        </svg>
+        <span class="flex min-w-0 flex-col leading-none">
+          <span class="truncate font-headline text-base font-bold uppercase tracking-tight text-on-surface">
+            NABLA <span class="text-primary">ASINT</span>
+          </span>
+          <span class="hidden truncate font-label text-[9px] font-semibold uppercase tracking-widest text-on-surface-variant sm:block">
+            Transit · Plataforma operacional
+          </span>
         </span>
       </a>
 
@@ -165,7 +177,7 @@
     <section class="fixed bottom-5 left-5 z-50 w-[min(92vw,360px)] rounded-xl border border-outline-variant/20 bg-surface-container-high p-4 shadow-xl md:left-72">
       @if (supportOpen()) {
         <h2 class="font-headline text-sm font-bold uppercase tracking-widest text-on-surface">Soporte operativo</h2>
-        <p class="mt-2 text-xs leading-relaxed text-on-surface-variant">Comparte el código de sesión con soporte para ubicar estado, ruta activa y navegador.</p>
+        <p class="mt-2 text-xs leading-relaxed text-on-surface-variant">Comparta este código con el equipo de soporte: les permitirá ubicar su estado, ruta activa y navegador de inmediato.</p>
         <button class="btn-primary mt-4" type="button" (click)="copySupportCode()">Copiar código</button>
       }
       @if (logsOpen()) {

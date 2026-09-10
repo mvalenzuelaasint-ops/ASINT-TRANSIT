@@ -47,7 +47,7 @@ type KpiTab = 'icf' | 'ip' | 'ir';
       } @else if (activeTab() === 'ip') {
         <app-indicator-runner
           title="IP — Índice de Puntualidad"
-          subtitle="Compara la hora de pasada observada contra la programada (A5) en cada punto de control. Sube las expediciones del mes y el A5 vigente."
+          subtitle="Compara la hora de pasada observada contra la programada (A5) en cada punto de control. Suba las expediciones del mes y el A5 vigente."
           endpoint="/api/ip"
           runLabel="Calcular IP"
           [showEmpresa]="true"

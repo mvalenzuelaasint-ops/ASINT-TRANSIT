@@ -46,8 +46,8 @@ interface RunResponse {
         <p class="font-label text-[10px] font-bold uppercase tracking-widest text-primary">Ejecución operacional</p>
         <h1 class="mt-1 font-headline text-2xl font-bold uppercase tracking-tight text-on-surface md:text-3xl">Trayectos realizados</h1>
         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">
-          Visualiza geográficamente los recorridos de cada bus. Carga los archivos de expediciones y mapeo de buses,
-          opcionalmente filtra por un día específico para acelerar el procesamiento.
+          Visualice geográficamente los recorridos de cada bus. Cargue los archivos de expediciones y mapeo de buses;
+          de forma opcional, filtre por un día específico para acelerar el procesamiento.
         </p>
       </header>
 
@@ -113,7 +113,7 @@ interface RunResponse {
               <span class="material-symbols-outlined text-3xl text-secondary">calendar_month</span>
               <div>
                 <h3 class="section-title">Filtro por día (opcional)</h3>
-                <p class="mt-1 text-xs text-on-surface-variant">Filtra a un único día para reducir el tiempo de procesamiento.</p>
+                <p class="mt-1 text-xs text-on-surface-variant">Filtre por un único día para reducir el tiempo de procesamiento.</p>
                 <p class="mt-2 text-xs text-on-surface-variant">Formato: YYYY-MM-DD</p>
               </div>
             </div>

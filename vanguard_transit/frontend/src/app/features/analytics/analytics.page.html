@@ -59,18 +59,18 @@
             <svg class="h-full w-full" viewBox="0 0 800 220" role="img" aria-label="Gráfico de eficiencia operacional">
               <defs>
                 <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stop-color="#1A3A6B" stop-opacity="0.24" />
-                  <stop offset="100%" stop-color="#1A3A6B" stop-opacity="0" />
+                  <stop offset="0%" stop-color="#6452A2" stop-opacity="0.24" />
+                  <stop offset="100%" stop-color="#6452A2" stop-opacity="0" />
                 </linearGradient>
               </defs>
               @for (line of [20, 60, 100, 140, 180]; track line) {
-                <line stroke="#7B8DA8" stroke-opacity="0.35" x1="0" x2="800" [attr.y1]="line" [attr.y2]="line"></line>
+                <line stroke="#A79BC7" stroke-opacity="0.35" x1="0" x2="800" [attr.y1]="line" [attr.y2]="line"></line>
               }
               <path [attr.d]="chartAreaPath()" fill="url(#chartGradient)"></path>
-              <path [attr.d]="chartLinePath()" fill="none" stroke="#1A3A6B" stroke-width="3"></path>
+              <path [attr.d]="chartLinePath()" fill="none" stroke="#6452A2" stroke-width="3"></path>
               <line stroke="#F5A800" stroke-dasharray="8,4" stroke-width="1.5" x1="0" x2="800" y1="92" y2="92"></line>
               @for (point of [{x: 200, y: 162}, {x: 400, y: 102}, {x: 600, y: 80}]; track point.x) {
-                <circle [attr.cx]="point.x" [attr.cy]="point.y" fill="#1A3A6B" r="4"></circle>
+                <circle [attr.cx]="point.x" [attr.cy]="point.y" fill="#6452A2" r="4"></circle>
               }
             </svg>
             <div class="mt-2 flex justify-between">

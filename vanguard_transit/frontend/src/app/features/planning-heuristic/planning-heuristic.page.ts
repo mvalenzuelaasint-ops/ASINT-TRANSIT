@@ -65,7 +65,7 @@ interface SheetsResponse {
         <p class="font-label text-[10px] font-bold uppercase tracking-widest text-primary">Planificación operacional</p>
         <h1 class="mt-1 font-headline text-2xl font-bold uppercase tracking-tight text-on-surface md:text-3xl">Por heurística</h1>
         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface-variant">
-          Carga el archivo Excel de entrada, elige la hoja a procesar y ejecuta el algoritmo
+          Cargue el archivo Excel de entrada, elija la hoja a procesar y ejecute el algoritmo
           heurístico
           <code class="rounded bg-surface-container px-1.5 py-0.5 text-[11px] text-primary">heurística_POs_USs_2026.py</code>.
           Los resultados (Excel + gráficos) aparecerán abajo.
@@ -122,7 +122,7 @@ interface SheetsResponse {
                 </p>
               } @else if (sheets().length > 0) {
                 <mat-form-field appearance="fill" class="w-full max-w-xl">
-                  <mat-label>Empieza a escribir para filtrar ({{ sheets().length }} hojas)</mat-label>
+                  <mat-label>Comience a escribir para filtrar ({{ sheets().length }} hojas)</mat-label>
                   <input
                     matInput
                     type="text"
@@ -141,7 +141,7 @@ interface SheetsResponse {
                 </mat-form-field>
                 @if (typedSheet() && !sheetIsValid()) {
                   <p class="text-[11px] text-error">
-                    "{{ typedSheet() }}" no coincide con ninguna hoja. Selecciona una de la lista.
+                    "{{ typedSheet() }}" no coincide con ninguna hoja. Seleccione una de la lista.
                   </p>
                 }
               }
