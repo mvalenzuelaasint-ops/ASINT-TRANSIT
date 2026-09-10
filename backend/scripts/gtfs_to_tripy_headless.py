@@ -30,7 +30,14 @@ HEURISTICA_SCRIPT = SCRIPT_DIR / 'heuristica_POs_USs_2026.py'
 # --------------------------------------------------------------------------
 # Lectura del GTFS
 # --------------------------------------------------------------------------
-def leer_gtfs(zip_path, columnas_por_archivo):
+def leer_gtfs(zip_path, columnas_por_archivo, dtypes_por_archivo=None):
+    """dtypes_por_archivo: {archivo: {columna: dtype}} para columnas que conviene
+    leer ya numéricas (float32/int32) en vez de string+conversión después. En
+    feeds grandes (stop_times.txt de millones de filas) esa columna de texto
+    queda viva en memoria el resto de la ejecución si no se lee así de una vez;
+    Render free comparte 512 MB entre Node y este proceso, así que cada columna
+    que se pueda achicar en la lectura misma importa."""
+    dtypes_por_archivo = dtypes_por_archivo or {}
     tablas = {}
     with zipfile.ZipFile(zip_path) as zf:
         nombres = {os.path.basename(n).lower(): n for n in zf.namelist()}
@@ -43,10 +50,12 @@ def leer_gtfs(zip_path, columnas_por_archivo):
         for clave, columnas in columnas_por_archivo.items():
             if clave not in nombres:
                 continue
+            hints = dtypes_por_archivo.get(clave, {})
+            dtype = {c: hints.get(c, str) for c in columnas} if columnas else str
             with zf.open(nombres[clave]) as f:
                 tablas[clave] = pd.read_csv(
-                    f, dtype=str, low_memory=False, usecols=columnas,
-                ) if columnas else pd.read_csv(f, dtype=str, low_memory=False)
+                    f, dtype=dtype, low_memory=False, usecols=columnas,
+                ) if columnas else pd.read_csv(f, dtype=dtype, low_memory=False)
     return tablas
 
 
@@ -378,7 +387,16 @@ def construir_inputuristica(zip_path):
         ['trip_id', 'stop_sequence', 'arrival_time', 'departure_time', 'shape_dist_traveled'],
     )
 
-    tablas = leer_gtfs(zip_path, columnas)
+    # float32 en vez de texto para stop_sequence/shape_dist_traveled: en
+    # stop_times.txt (potencialmente millones de filas) esto es la diferencia
+    # entre una columna de objetos Python y un array compacto de 4 bytes/valor.
+    # (No se aplica a shapes.txt/stops.txt: son ~100x más chicas, así que el
+    # ahorro es marginal, y float32 perdía precisión suficiente como para
+    # cambiar qué puntos sobreviven la simplificación RDP del mapa.)
+    dtypes = {
+        'stop_times.txt': {'stop_sequence': 'float32', 'shape_dist_traveled': 'float32'},
+    }
+    tablas = leer_gtfs(zip_path, columnas, dtypes)
     routes = tablas['routes.txt']
     trips = tablas['trips.txt'].copy()
 
