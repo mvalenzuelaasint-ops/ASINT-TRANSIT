@@ -211,6 +211,13 @@ textarea {
   line-height: 1.55;
 }
 
+/* Mapa de servicios GTFS (Flota planificada). Leaflet fija stroke/opacity como
+   estilo inline en cada path al llamar setStyle(); esta transicion es lo que
+   convierte ese cambio en la animacion de resaltado al elegir un servicio. */
+.gtfs-map .leaflet-interactive {
+  transition: stroke 0.35s ease, stroke-opacity 0.35s ease, stroke-width 0.35s ease;
+}
+
 .fleet-marker {
   display: grid;
   width: 34px;

@@ -22,6 +22,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
     items: [
       { path: '/planning/optimization', label: 'Por optimización', shortLabel: 'Optimización', icon: 'tune', keywords: ['optimización', 'solver', 'lineal', 'entera', 'plan'] },
       { path: '/planning/heuristic', label: 'Por heurística', shortLabel: 'Heurística', icon: 'extension', keywords: ['heurística', 'reglas', 'algoritmo', 'aproximado', 'plan'] },
+      { path: '/planning/fleet', label: 'Flota planificada (GTFS)', shortLabel: 'Flota GTFS', icon: 'directions_bus', keywords: ['gtfs', 'flota', 'planificada', 'schedule', 'buses'] },
     ],
   },
   {

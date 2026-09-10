@@ -17,6 +17,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/planning-heuristic/planning-heuristic.page').then((m) => m.PlanningHeuristicPage),
   },
+  {
+    path: 'planning/fleet',
+    loadComponent: () =>
+      import('./features/planning-fleet/planning-fleet.page').then((m) => m.PlanningFleetPage),
+  },
   // ----- Ejecución operacional -----
   {
     path: 'execution/management',

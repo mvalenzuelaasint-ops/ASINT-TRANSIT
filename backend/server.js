@@ -7,6 +7,7 @@ import trayectosRouter from './routes/trayectos.js';
 import icfRouter from './routes/icf.js';
 import ipRouter from './routes/ip.js';
 import irRouter from './routes/ir.js';
+import tripyRouter from './routes/tripy.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +34,7 @@ app.get('/api', (_req, res) => {
       icf: '/api/icf',
       ip: '/api/ip',
       ir: '/api/ir',
+      tripy: '/api/tripy',
     },
   });
 });
@@ -44,6 +46,7 @@ app.use('/api/trayectos', trayectosRouter);
 app.use('/api/icf', icfRouter);
 app.use('/api/ip', ipRouter);
 app.use('/api/ir', irRouter);
+app.use('/api/tripy', tripyRouter);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'NOMINAL', uptime: process.uptime(), timestamp: new Date().toISOString() });
