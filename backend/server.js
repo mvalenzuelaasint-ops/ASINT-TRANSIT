@@ -13,7 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const DEFAULT_ORIGINS = [
   'http://localhost:5173',
-  'https://asint-transit.netlify.app',
+  // El sitio de Netlify se recreo bajo la cuenta nueva (mvalenzuelaasint-ops) y
+  // cambio de subdominio; el anterior (asint-transit.netlify.app) ya no existe.
+  'https://nabla-asint-transit.netlify.app',
 ];
 const allowedOrigins = (process.env.CORS_ORIGINS || DEFAULT_ORIGINS.join(','))
   .split(',')
