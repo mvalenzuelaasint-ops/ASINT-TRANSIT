@@ -381,7 +381,6 @@ def construir_inputuristica(zip_path):
     tablas = leer_gtfs(zip_path, columnas)
     routes = tablas['routes.txt']
     trips = tablas['trips.txt'].copy()
-    stop_times = tablas['stop_times.txt'].copy()
 
     if 'shape_id' not in trips.columns:
         trips['shape_id'] = np.nan
@@ -400,14 +399,21 @@ def construir_inputuristica(zip_path):
     trips_expandido = trips_con_dia.explode('tipos_dia').rename(columns={'tipos_dia': 'tipo_dia'})
 
     # --- primer salida / última llegada por trip ---
-    st_sorted = stop_times.copy()
+    # Solo las columnas que hacen falta aquí (no shape_dist_traveled): stop_times.txt
+    # puede tener millones de filas en feeds grandes, y esta función corre en un
+    # contenedor con RAM compartida entre Node y Python (Render free = 512 MB).
+    st_sorted = tablas['stop_times.txt'][['trip_id', 'stop_sequence', 'arrival_time', 'departure_time']].copy()
     st_sorted['stop_sequence'] = pd.to_numeric(st_sorted['stop_sequence'], errors='coerce')
-    st_sorted = st_sorted.sort_values(['trip_id', 'stop_sequence'])
-    st_sorted['salida_s'] = _hms_a_segundos(st_sorted['departure_time'])
-    st_sorted['llegada_s'] = _hms_a_segundos(st_sorted['arrival_time'])
+    st_sorted.sort_values(['trip_id', 'stop_sequence'], inplace=True)
+    salida_s = _hms_a_segundos(st_sorted['departure_time'])
+    llegada_s = _hms_a_segundos(st_sorted['arrival_time'])
+    st_sorted.drop(columns=['arrival_time', 'departure_time'], inplace=True)
+    st_sorted['salida_s'] = salida_s
+    st_sorted['llegada_s'] = llegada_s
 
     primeras = st_sorted.dropna(subset=['salida_s']).groupby('trip_id')['salida_s'].first()
     ultimas = st_sorted.dropna(subset=['llegada_s']).groupby('trip_id')['llegada_s'].last()
+    del st_sorted
 
     distancia_km, metodo_distancia = calcular_distancia_por_trip_km(tablas, trips)
     print(f'[GTFS] Distancia estimada via: {metodo_distancia}')
