@@ -8,12 +8,19 @@
  *   POST /run     -> JSON { runId, seleccion }, reusa la matriz de /preview (mismo
  *                     runId) y corre heuristica_POs_USs_2026.py solo para la
  *                     selección ('TODAS' o un unidadServicio puntual).
+ *
+ * El GTFS se sube en pedazos chicos (ver /upload/*): probamos en producción que
+ * Render free corta cualquier request de subida de más de ~10 MB con un 502
+ * casi instantáneo (confirmado con un archivo de relleno irrelevante: el corte
+ * depende del tamaño de la subida, no de lo que el script procesa). /preview
+ * (subida directa en un solo POST) se conserva para uso local/API donde ese
+ * límite no aplica.
  */
 import { Router } from 'express';
 import multer from 'multer';
 import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { access, mkdir, readdir, stat } from 'node:fs/promises';
+import { access, appendFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,6 +30,11 @@ const SCRIPT_PATH =
   process.env.ASINT_TRIPY_SCRIPT || path.join(BACKEND_ROOT, 'scripts', 'gtfs_to_tripy_headless.py');
 const SCRIPT_DIR = path.dirname(SCRIPT_PATH);
 const RUNS_ROOT = path.join(BACKEND_ROOT, 'runs', 'tripy');
+const UPLOADS_ROOT = path.join(BACKEND_ROOT, 'runs', 'tripy-uploads');
+// El frontend manda pedazos de ~2 MB; el doble de margen absorbe overhead de
+// multipart sin abrir la puerta a que un cliente mal hecho mande un chunk gigante.
+const CHUNK_MAX_BYTES = 4 * 1024 * 1024;
+const UPLOAD_TTL_MS = 60 * 60 * 1000; // 1h: limpieza oportunista de subidas abandonadas
 
 const PYTHON_CMD =
   process.env.ASINT_PYTHON_CMD ||
@@ -50,6 +62,11 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 },
 });
 
+const chunkUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: CHUNK_MAX_BYTES },
+});
+
 const router = Router();
 
 router.get('/status', (_req, res) => {
@@ -60,22 +77,124 @@ router.post('/preview', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'Falta el archivo GTFS (campo "file").' });
   }
+  previsualizarDesdeArchivo(req.file.path, req.file.originalname, res, req.runId, req.runDir);
+});
 
-  const runId = req.runId;
-  const outputDir = path.join(req.runDir, 'output');
+// --------------------------------------------------------------------------
+// Subida en partes: init (declara el upload) -> chunk (uno por pedazo, en
+// orden) -> complete (reensambla y recién ahí dispara la previsualización).
+// --------------------------------------------------------------------------
+router.post('/upload/init', async (req, res) => {
+  const filename = typeof req.body?.filename === 'string' ? req.body.filename.trim() : '';
+  const totalChunks = Number(req.body?.totalChunks);
+  if (!filename || !Number.isInteger(totalChunks) || totalChunks < 1) {
+    return res.status(400).json({ error: 'Faltan "filename" o "totalChunks" (entero >= 1) válidos.' });
+  }
+
+  limpiarUploadsVencidos().catch(() => {});
+
+  const uploadId = randomUUID();
+  const uploadDir = path.join(UPLOADS_ROOT, uploadId);
+  await mkdir(uploadDir, { recursive: true });
+  await writeFile(path.join(uploadDir, 'meta.json'), JSON.stringify({ filename, totalChunks }));
+  res.json({ uploadId });
+});
+
+router.post('/upload/chunk', chunkUpload.single('chunk'), async (req, res) => {
+  const uploadId = sanitizeId(req.body?.uploadId);
+  const chunkIndex = Number(req.body?.chunkIndex);
+  if (!uploadId || !Number.isInteger(chunkIndex) || chunkIndex < 0 || !req.file) {
+    return res.status(400).json({ error: 'Parámetros de chunk inválidos (uploadId/chunkIndex/chunk).' });
+  }
+
+  const uploadDir = path.join(UPLOADS_ROOT, uploadId);
+  try {
+    await access(uploadDir);
+  } catch {
+    return res.status(404).json({ error: 'uploadId no encontrado (¿nunca se llamó a /upload/init?).' });
+  }
+
+  const chunkPath = path.join(uploadDir, `chunk_${String(chunkIndex).padStart(6, '0')}.part`);
+  await writeFile(chunkPath, req.file.buffer);
+  res.json({ received: chunkIndex });
+});
+
+router.post('/upload/complete', async (req, res) => {
+  const uploadId = sanitizeId(req.body?.uploadId);
+  if (!uploadId) return res.status(400).json({ error: 'Falta "uploadId".' });
+
+  const uploadDir = path.join(UPLOADS_ROOT, uploadId);
+  let meta;
+  try {
+    meta = JSON.parse(await readFile(path.join(uploadDir, 'meta.json'), 'utf-8'));
+  } catch {
+    return res.status(404).json({ error: 'uploadId no encontrado (¿expiró o ya se completó?).' });
+  }
+
+  const runId = randomUUID();
+  const runDir = path.join(RUNS_ROOT, runId);
+  const inputDir = path.join(runDir, 'input');
+  await mkdir(path.join(runDir, 'output'), { recursive: true });
+  await mkdir(inputDir, { recursive: true });
+
+  const finalPath = path.join(inputDir, meta.filename);
+  try {
+    for (let i = 0; i < meta.totalChunks; i++) {
+      const chunkPath = path.join(uploadDir, `chunk_${String(i).padStart(6, '0')}.part`);
+      const data = await readFile(chunkPath);
+      await appendFile(finalPath, data);
+    }
+  } catch (err) {
+    return res.status(400).json({
+      error: 'Faltan pedazos de la subida (¿se llamó a /upload/chunk para todos los índices?).',
+      detail: err.message,
+    });
+  } finally {
+    await rm(uploadDir, { recursive: true, force: true }).catch(() => {});
+  }
+
+  previsualizarDesdeArchivo(finalPath, meta.filename, res, runId, runDir);
+});
+
+async function limpiarUploadsVencidos() {
+  let entries;
+  try {
+    entries = await readdir(UPLOADS_ROOT, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  const ahora = Date.now();
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const dir = path.join(UPLOADS_ROOT, entry.name);
+    try {
+      const s = await stat(dir);
+      if (ahora - s.mtimeMs > UPLOAD_TTL_MS) {
+        await rm(dir, { recursive: true, force: true });
+      }
+    } catch {
+      // ignorar: entre el readdir y el stat pudo haberse borrado solo
+    }
+  }
+}
+
+function previsualizarDesdeArchivo(inputFile, originalName, res, runIdExistente, runDirExistente) {
+  const runId = runIdExistente || randomUUID();
+  const runDir = runDirExistente || path.join(RUNS_ROOT, runId);
+  const outputDir = path.join(runDir, 'output');
   const env = {
     ...process.env,
     ASINT_HEADLESS: '1',
     ASINT_TRIPY_ACCION: 'previsualizar',
-    ASINT_INPUT_FILE: req.file.path,
+    ASINT_INPUT_FILE: inputFile,
     ASINT_OUTPUT_DIR: outputDir,
     PYTHONIOENCODING: 'utf-8',
   };
 
   runScript(env, outputDir, (result) => {
-    res.status(result.success ? 200 : 500).json({ runId, inputFile: req.file.originalname, ...result });
+    res.status(result.success ? 200 : 500).json({ runId, inputFile: originalName, ...result });
   });
-});
+}
 
 router.post('/run', async (req, res) => {
   const runId = sanitizeId(req.body?.runId);

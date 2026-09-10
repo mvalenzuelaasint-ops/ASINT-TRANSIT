@@ -2,12 +2,19 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, NgZone, OnDestroy, signal, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
+import { firstValueFrom } from 'rxjs';
 
 // El proxy de Netlify mata cualquier respuesta que tarde mas de 26 s.
 // Previsualizar (ETL del GTFS completo) y ejecutar (heuristica encadenada)
 // pueden tardar mas que eso con feeds grandes, asi que ambos llamados van
 // directo a Render (ver planning-heuristic.page.ts para el mismo patron).
 const RENDER_BACKEND = 'https://asint-transit.onrender.com';
+
+// Render free corta cualquier subida de mas de ~10 MB con un 502 casi
+// instantaneo (confirmado en produccion con un archivo de relleno irrelevante:
+// el corte depende del tamano de la subida, no de cuanto proceso el script).
+// Por eso el GTFS se manda en pedazos chicos en vez de en un solo POST.
+const CHUNK_SIZE = 2 * 1024 * 1024;
 
 function longRunUrl(path: string): string {
   if (typeof window === 'undefined') return path;
@@ -92,7 +99,7 @@ interface Servicio {
               <button class="btn-primary" type="button" [disabled]="!canPreview()" (click)="previsualizar()">
                 @if (previewing()) {
                   <span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
-                  Leyendo GTFS...
+                  {{ uploadProgress() < 100 ? 'Subiendo ' + uploadProgress() + '%...' : 'Leyendo GTFS...' }}
                 } @else {
                   <span class="material-symbols-outlined text-sm">map</span>
                   Previsualizar
@@ -258,6 +265,7 @@ export class PlanningFleetPage implements OnDestroy {
 
   readonly inputFile = signal<File | null>(null);
   readonly previewing = signal(false);
+  readonly uploadProgress = signal(0);
   readonly previewRunId = signal<string | null>(null);
   readonly servicios = signal<Servicio[]>([]);
   readonly seleccion = signal('TODAS');
@@ -319,37 +327,65 @@ export class PlanningFleetPage implements OnDestroy {
     this.runErrorDetail.set(null);
   }
 
-  previsualizar(): void {
+  async previsualizar(): Promise<void> {
     const file = this.inputFile();
     if (!file) return;
 
     this.previewing.set(true);
     this.resetAll();
+    this.uploadProgress.set(0);
 
-    const form = new FormData();
-    form.append('file', file, file.name);
+    try {
+      const res = await this.subirEnPedazos(file);
+      this.previewing.set(false);
+      if (!res.success) {
+        this.previewErrorMessage.set(res.error || `Python terminó con código ${res.exitCode}.`);
+        this.previewErrorDetail.set(res.stderr || res.stdout || res.detail || null);
+        return;
+      }
+      this.previewRunId.set(res.runId);
+      const servicios = (res.files ?? []).find((f) => f.name === 'servicios.json');
+      const geo = (res.files ?? []).find((f) => f.ext === '.geojson');
+      if (servicios) this.loadServicios(res.runId, servicios.name);
+      if (geo) this.loadGeojson(res.runId, geo.name);
+    } catch (err: unknown) {
+      this.previewing.set(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const body = (err as any)?.error ?? {};
+      this.previewErrorMessage.set(body.error || (err as any)?.message || 'Error desconocido leyendo el GTFS.');
+      this.previewErrorDetail.set(body.stderr || body.stdout || body.detail || null);
+    }
+  }
 
-    this.http.post<StepResponse>(longRunUrl('/api/tripy/preview'), form).subscribe({
-      next: (res) => {
-        this.previewing.set(false);
-        if (!res.success) {
-          this.previewErrorMessage.set(res.error || `Python terminó con código ${res.exitCode}.`);
-          this.previewErrorDetail.set(res.stderr || res.stdout || res.detail || null);
-          return;
-        }
-        this.previewRunId.set(res.runId);
-        const servicios = (res.files ?? []).find((f) => f.name === 'servicios.json');
-        const geo = (res.files ?? []).find((f) => f.ext === '.geojson');
-        if (servicios) this.loadServicios(res.runId, servicios.name);
-        if (geo) this.loadGeojson(res.runId, geo.name);
-      },
-      error: (err) => {
-        this.previewing.set(false);
-        const body = err.error ?? {};
-        this.previewErrorMessage.set(body.error || err.message || 'Error desconocido leyendo el GTFS.');
-        this.previewErrorDetail.set(body.stderr || body.stdout || body.detail || null);
-      },
-    });
+  /** Sube el GTFS en pedazos de CHUNK_SIZE (ver comentario arriba) y recién al
+   * terminar dispara la previsualización en el backend. */
+  private async subirEnPedazos(file: File): Promise<StepResponse> {
+    const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
+
+    const init = await firstValueFrom(
+      this.http.post<{ uploadId: string }>(longRunUrl('/api/tripy/upload/init'), {
+        filename: file.name,
+        totalChunks,
+      }),
+    );
+
+    for (let i = 0; i < totalChunks; i++) {
+      const inicio = i * CHUNK_SIZE;
+      const pedazo = file.slice(inicio, inicio + CHUNK_SIZE);
+      const form = new FormData();
+      form.append('uploadId', init.uploadId);
+      form.append('chunkIndex', String(i));
+      form.append('chunk', pedazo, file.name);
+      await firstValueFrom(this.http.post(longRunUrl('/api/tripy/upload/chunk'), form));
+      this.uploadProgress.set(Math.round(((i + 1) / totalChunks) * 100));
+    }
+
+    return firstValueFrom(
+      this.http.post<StepResponse>(longRunUrl('/api/tripy/upload/complete'), {
+        uploadId: init.uploadId,
+        filename: file.name,
+      }),
+    );
   }
 
   ejecutar(): void {
